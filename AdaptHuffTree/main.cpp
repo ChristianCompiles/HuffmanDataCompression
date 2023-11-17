@@ -4,9 +4,6 @@
 #include <vector>
 #include "huffTree.h"
 
-
-
-
 int main(int argc, const char* argv[])
 {
 	//if (argc != 4) // make sure 4 command line statements are given
