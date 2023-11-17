@@ -1,0 +1,90 @@
+encoding
+	read in character from message
+	
+	if tree is empty, 
+		make a parent node with count = 1,
+		that has zero node for left child and
+		char node for right child
+		set root equal to parent
+		continue reading in char from message
+
+	if char in tree
+		output path to char
+		update count of char node
+		increment parent node count
+
+		while node's parent isn't nullptr
+			if parent node count > prev node's count
+			find leader
+			if leader is parent of parent
+				increment count of parent of parent
+			else
+				swap parent and leader
+				increment parent count
+			set node to parent's parent
+
+	else
+		make new parent node with count = 1,
+		make zero node left child of new parent
+		make char node right child of new parent
+		make new parent node be child of zero node's previous parent
+		place newly made parent where zero node originally was
+		update count of new parent's parent
+		
+		while node's parent isn't nullptr
+			if parent node count > prev node's count
+			find leader
+			if leader is parent of parent
+				increment count of parent of parent
+			else
+				swap parent and leader
+				increment parent count
+			set node to parent's parent
+
+
+decoding
+
+	read in single bit from message
+
+	if tree is empty, 
+			make a parent node with count = 1,
+			that has zero node for left child and
+			char node for right child
+			set root equal to parent
+			continue reading in char from message
+
+	read in binary from message until zero node or char node has been reached
+
+
+	if char node reached
+		output char
+		increase count
+		increase parent count
+		while node's parent isn't nullptr
+			if parent node count > prev node's count
+			find leader
+			if leader is parent of parent
+				increment count of parent of parent
+			else
+				swap parent and leader
+				increment parent count
+			set node to parent's parent
+
+	if zero node reached 
+		read in next 8 bits to determine char
+		create parent node with count = 1
+		that has zero node for left child
+		and char node for right child
+		update count of parent that was given newly made parent
+		place newly made parent where zero node originally was
+		while node's parent isn't nullptr
+			if parent node count > prev node's count
+			find leader
+			if leader is parent of parent
+				increment count of parent of parent
+			else
+				swap parent and leader
+				increment parent count
+			set node to parent's parent
+		
+
