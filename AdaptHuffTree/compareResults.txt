@@ -1,0 +1,2 @@
+my tree output: 01100001 1 0000011000100011100
+lecture output: 

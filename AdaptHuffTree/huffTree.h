@@ -69,8 +69,9 @@ public:
 
 				this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
 				
-				printCharAsBin(tmpCh);
-				this->strToEncode.push_back(tmpCh); // add ch to string to encode 
+				//printCharAsBin(tmpCh);
+				std::string binaryStr = std::bitset<8>(tmpCh).to_string();
+				this->strToEncode += binaryStr; // add ch to string to encode 
 				
 				increment(charNode);
 				i++;
@@ -83,18 +84,18 @@ public:
 			if (foundNode) // node w/ char has address, so its been found in tree
 			{
 				calcAppendPathToRoot(foundNode); // find path to root from char
-				writePath();
-				printPathAndClear(); // print path rather than write to file
+				//writePath();
+				//printPathAndClear(); // print path rather than write to file
 				increment(foundNode); // performs parent increment and necessary remeditations
 			}
 			else // char not in tree
 			{
 				// print path to zeroNode and ascii of char
 				calcAppendPathToRoot(this->zeroNode);
-				writePath();
-				printPathAndClear();
+				//writePath();
+				//printPathAndClear();
 				writeChar(tmpCh);
-				printCharAsBin(tmpCh);
+				//printCharAsBin(tmpCh);
 				
 				huffNode* newParent = new huffNode;
 				huffNode* charNode = new huffNode(tmpCh);
@@ -128,6 +129,8 @@ public:
 			i++;
 			ultimatePrint();
 		}
+
+		std::cout << std::endl << this->strToEncode;
 	}
 
 	void increment(huffNode* node) // pass in node to increment its count, parent count, perform sibling check and necessary remediation
@@ -242,21 +245,7 @@ public:
 		//	outputfile << !!((tmpCh << i) & 0x80);
 		//}
 	}
-	void addChartoEncode(char tmpCh)
-	{
-		this->toEncode += tmpCh;
 
-	}
-
-	void addPathtoEncodeStr()
-	{
-		std::string tmpStr;
-		for (std::vector<int>::iterator it = vect.begin(); it != vect.end(); ++it) // print path to root
-		{
-			tmpStr = (it)
-			this->toEncode += *(it);
-		}
-	}
 	void writePath()
 	{
 		std::string outputfilename = this->readFileName + ".encoded";
@@ -285,20 +274,24 @@ public:
 	void calcAppendPathToRoot(huffNode* node) // start at node and find path back to root
 	{
 		vect.clear(); // in case not cleared before creating path
+		std::string path;
 		while (node->parent != nullptr)
 		{
 			if (node->parent->leftChild == node) // if child is left child
 			{
-				this->vect.push_back(0);
+				path.push_back('0');
 			}
 			else
 			{
-				this->vect.push_back(1);
+				path.push_back('1');
+
 			}
 			node = node->parent;
 		}
 
-		std::reverse(this->vect.begin(), this->vect.end());
+		std::reverse(path.begin(), path.end());
+		this->strToEncode += path; // append path to strToEncode
+
 	}
 	void printPathAndClear()
 	{
