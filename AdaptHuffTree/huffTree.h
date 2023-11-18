@@ -47,7 +47,7 @@ public:
 		{
 			tmpCh = bunchLetters[i];
 	
-			ultimatePrint();
+			//ultimatePrint();
 			
 			if (!root) // if tree empty
 			{
@@ -83,7 +83,7 @@ public:
 
 			if (foundNode) // node w/ char has address, so its been found in tree
 			{
-				calcAppendPathToRoot(foundNode); // find path to root from char
+				calcPathToRootAndAppend(foundNode); // find path to root from char
 				//writePath();
 				//printPathAndClear(); // print path rather than write to file
 				increment(foundNode); // performs parent increment and necessary remeditations
@@ -91,10 +91,12 @@ public:
 			else // char not in tree
 			{
 				// print path to zeroNode and ascii of char
-				calcAppendPathToRoot(this->zeroNode);
+				calcPathToRootAndAppend(this->zeroNode);
+				std::string binaryStr = std::bitset<8>(tmpCh).to_string();
+				this->strToEncode += binaryStr; // add ch to string to encode 
 				//writePath();
 				//printPathAndClear();
-				writeChar(tmpCh);
+				//writeChar(tmpCh);
 				//printCharAsBin(tmpCh);
 				
 				huffNode* newParent = new huffNode;
@@ -127,10 +129,10 @@ public:
 			}
 			
 			i++;
-			ultimatePrint();
+			//ultimatePrint();
 		}
 
-		std::cout << std::endl << this->strToEncode;
+		std::cout << this->strToEncode << std::endl;
 	}
 
 	void increment(huffNode* node) // pass in node to increment its count, parent count, perform sibling check and necessary remediation
@@ -271,9 +273,8 @@ public:
 		}
 		outputfile.close();
 	}
-	void calcAppendPathToRoot(huffNode* node) // start at node and find path back to root
+	void calcPathToRootAndAppend(huffNode* node) // start at node and find path back to root
 	{
-		vect.clear(); // in case not cleared before creating path
 		std::string path;
 		while (node->parent != nullptr)
 		{
