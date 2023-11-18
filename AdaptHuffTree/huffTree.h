@@ -1,5 +1,6 @@
 #include "huffNode.h"
 #include <iostream>
+#include <algorithm>
 #include <fstream>
 #include <bitset>
 #pragma once
@@ -11,41 +12,57 @@ private:
 	huffNode* root = nullptr; // root of the tree
 	std::string alphabet = ""; // alphabet used in message
 	std::string readFileName = ""; // file to read from
-	huffNode* zeroNode = nullptr; // store unused characters
+	huffNode* zeroNode = new huffNode; // store unused characters
 	huffNode* hashTable[128] = { nullptr }; // has potential to hold all 128 ascii char
 	std::string strToEncode = "";
 public:
-	huffTree()
+	huffTree(){}
+	huffTree(std::string action, std::string msgAlphabet, std::string sourcefile)
 	{
-		this->zeroNode = new huffNode;
-		this->zeroNode->count = 0;
-	}
-	huffTree(std::string msgAlphabet, std::string sourcefile)
-	{
-		this->alphabet = msgAlphabet;
+		this->alphabet = msgAlphabet; 
 		this->readFileName = sourcefile;
-		this->zeroNode = new huffNode;
-		this->zeroNode->count = 0;
+		if (action == "encode")
+		{
+			encode();
+		}
+		else if (action == "decode")
+		{
+			//decode
+		}
+		else
+		{
+			std::cout << "Try again with properly spelled action\n";
+		}
+
 	}
+	huffTree(std::string msgAlphabet){this->alphabet = msgAlphabet;}
 
 	void encode()
-	{/*this->readFileName = "input123";
-		std::fstream source(readFileName, std::fstream::in);
+	{
+	
+		std::fstream source(this->readFileName, std::fstream::in);
 		if (!source)
 		{
 			std::cout << "Error opening input file: " << readFileName;
-		}*/
+		}
 
 		// aabccdaef
-		std::string bunchLetters = "aabccdaef"; // messes up at 'd' as of 11/09/23
+		//std::string bunchLetters = "aabccdaef"; // messes up at 'd' as of 11/09/23
 		std::string binaryStr; // hold string of char ascii in binary
 		int i = 0;
 		char tmpCh;
 
-		while (i < bunchLetters.size())
+		while (!source.eof())
 		{
-			tmpCh = bunchLetters[i];
-	
+			source >> tmpCh;
+		
+			// make sure tmpCh is in alphabet
+			if(this->alphabet.find(tmpCh) == std::string::npos) // not found
+			{
+				std::cout << "Character to encode not in given alphabet\n";
+				return;
+			} 
+
 			printTree();
 			
 			if (!root) // if tree empty
@@ -223,7 +240,7 @@ public:
 			node = node->parent;
 		}
 
-		std::reverse(path.begin(), path.end());
+		reverse(path.begin(), path.end());
 		this->strToEncode += path; // append path to strToEncode
 
 	}
