@@ -15,7 +15,7 @@ private:
 	huffNode* zeroNode = nullptr; // store unused characters
 	std::vector<int> vect;
 	huffNode* hashTable[128] = { nullptr }; // has potential to hold all 128 ascii char
-
+	std::string strToEncode = "";
 public:
 	huffTree()
 	{
@@ -70,7 +70,8 @@ public:
 				this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
 				
 				printCharAsBin(tmpCh);
-				writeChar(tmpCh);
+				this->strToEncode.push_back(tmpCh); // add ch to string to encode 
+				
 				increment(charNode);
 				i++;
 				continue;
@@ -81,7 +82,7 @@ public:
 
 			if (foundNode) // node w/ char has address, so its been found in tree
 			{
-				pathToRoot(foundNode); // find path to root from char
+				calcAppendPathToRoot(foundNode); // find path to root from char
 				writePath();
 				printPathAndClear(); // print path rather than write to file
 				increment(foundNode); // performs parent increment and necessary remeditations
@@ -89,7 +90,7 @@ public:
 			else // char not in tree
 			{
 				// print path to zeroNode and ascii of char
-				pathToRoot(this->zeroNode);
+				calcAppendPathToRoot(this->zeroNode);
 				writePath();
 				printPathAndClear();
 				writeChar(tmpCh);
@@ -241,6 +242,21 @@ public:
 		//	outputfile << !!((tmpCh << i) & 0x80);
 		//}
 	}
+	void addChartoEncode(char tmpCh)
+	{
+		this->toEncode += tmpCh;
+
+	}
+
+	void addPathtoEncodeStr()
+	{
+		std::string tmpStr;
+		for (std::vector<int>::iterator it = vect.begin(); it != vect.end(); ++it) // print path to root
+		{
+			tmpStr = (it)
+			this->toEncode += *(it);
+		}
+	}
 	void writePath()
 	{
 		std::string outputfilename = this->readFileName + ".encoded";
@@ -266,7 +282,7 @@ public:
 		}
 		outputfile.close();
 	}
-	void pathToRoot(huffNode* node) // start at node and find path back to root
+	void calcAppendPathToRoot(huffNode* node) // start at node and find path back to root
 	{
 		vect.clear(); // in case not cleared before creating path
 		while (node->parent != nullptr)
