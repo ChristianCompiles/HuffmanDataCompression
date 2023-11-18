@@ -33,9 +33,7 @@ public:
 		{
 			std::cout << "Try again with properly spelled action\n";
 		}
-
 	}
-	huffTree(std::string msgAlphabet){this->alphabet = msgAlphabet;}
 
 	void encode()
 	{
@@ -46,15 +44,30 @@ public:
 			std::cout << "Error opening input file: " << readFileName;
 		}
 
-		// aabccdaef
-		//std::string bunchLetters = "aabccdaef"; // messes up at 'd' as of 11/09/23
+		// string encoded in lecture: aabccdaef 
 		std::string binaryStr; // hold string of char ascii in binary
 		int i = 0;
-		char tmpCh;
+		char tmpCh = 0;
 
-		while (!source.eof())
+		while (!source.get(tmpCh).eof())
 		{
 			source >> tmpCh;
+
+			if (tmpCh == 92) // if char read in is backslash:
+			{
+				source >> tmpCh;
+				
+				switch (tmpCh)
+				{
+				case 'n': tmpCh = '\n';
+					break;
+				case 't': tmpCh = '\t';
+					break;
+				case '\\': tmpCh = '\\';
+					break;
+				}
+				
+			}
 		
 			// make sure tmpCh is in alphabet
 			if(this->alphabet.find(tmpCh) == std::string::npos) // not found
@@ -63,7 +76,7 @@ public:
 				return;
 			} 
 
-			printTree();
+			//printTree();
 			
 			if (!root) // if tree empty
 			{
@@ -137,7 +150,7 @@ public:
 			}
 			
 			i++;
-			printTree();
+			//printTree();
 		}
 
 		std::cout << this->strToEncode << std::endl;
@@ -242,7 +255,6 @@ public:
 
 		reverse(path.begin(), path.end());
 		this->strToEncode += path; // append path to strToEncode
-
 	}
 	void printCharAsBin(char tmpCh)
 	{
