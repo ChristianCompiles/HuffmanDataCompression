@@ -47,7 +47,7 @@ public:
 		{
 			tmpCh = bunchLetters[i];
 	
-			//ultimatePrint();
+			printTree();
 			
 			if (!root) // if tree empty
 			{
@@ -69,7 +69,6 @@ public:
 
 				this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
 				
-				//printCharAsBin(tmpCh);
 				std::string binaryStr = std::bitset<8>(tmpCh).to_string();
 				this->strToEncode += binaryStr; // add ch to string to encode 
 				
@@ -84,8 +83,6 @@ public:
 			if (foundNode) // node w/ char has address, so its been found in tree
 			{
 				calcPathToRootAndAppend(foundNode); // find path to root from char
-				//writePath();
-				//printPathAndClear(); // print path rather than write to file
 				increment(foundNode); // performs parent increment and necessary remeditations
 			}
 			else // char not in tree
@@ -94,10 +91,6 @@ public:
 				calcPathToRootAndAppend(this->zeroNode);
 				std::string binaryStr = std::bitset<8>(tmpCh).to_string();
 				this->strToEncode += binaryStr; // add ch to string to encode 
-				//writePath();
-				//printPathAndClear();
-				//writeChar(tmpCh);
-				//printCharAsBin(tmpCh);
 				
 				huffNode* newParent = new huffNode;
 				huffNode* charNode = new huffNode(tmpCh);
@@ -129,7 +122,7 @@ public:
 			}
 			
 			i++;
-			//ultimatePrint();
+			printTree();
 		}
 
 		std::cout << this->strToEncode << std::endl;
@@ -184,11 +177,9 @@ public:
 		// swap everything but children pointers
 		std::swap(node1->ch, node2->ch);
 		std::swap(node1->count, node2->count);
-		//std::swap(node1->prev, node2->prev);
-		//std::swap(node1->next, node2->next);
-		//std::swap(node1->parent, node2->parent);
 		std::swap(node1->leftChild, node2->leftChild);
 		std::swap(node1->rightChild, node2->rightChild);
+
 		if (node1->leftChild)
 		{
 			node1->leftChild->parent = node1;
@@ -217,62 +208,6 @@ public:
 			this->hashTable[node2->ch] = node2;
 		}
 	}
-	void printCharAsBin(char tmpCh)
-	{
-		for (int i = 0; i < 8; i++) // convert ascii decimal to string of zeros and ones (binary)
-		{
-			std::cout << !!((tmpCh << i) & 0x80);
-		}
-		std::cout << " ";
-	}
-	void writeChar(char tmpCh)
-	{
-		std::string outputfilename = this->readFileName + ".encoded";
-		std::ofstream outputfile;
-
-		outputfile.open(outputfilename, std::ios::app | std::ios::binary | std::ios::out);
-
-		if (!outputfile)
-		{
-			std::cout << "Error opening output file: " << outputfilename << std::endl;
-			return;
-		}
-
-		std::string binaryStr = std::bitset<8>(tmpCh).to_string();
-		outputfile.seekp(0, std::ios::end);
-		outputfile.write(reinterpret_cast<char*>(&binaryStr), sizeof(binaryStr));
-		outputfile.close();
-		//for (int i = 0; i < 8; i++) // convert ascii decimal to string of zeros and ones (binary)
-		//{
-		//	outputfile << !!((tmpCh << i) & 0x80);
-		//}
-	}
-
-	void writePath()
-	{
-		std::string outputfilename = this->readFileName + ".encoded";
-		std::ofstream outputfile;
-
-		outputfile.open(outputfilename, std::ios::binary | std::ios::app | std::ios::out);
-
-		if (!outputfile)
-		{
-			std::cout << "Error opening output file: " << outputfilename << std::endl;
-			return;
-		}
-
-		for (std::vector<int>::iterator it = vect.begin(); it != vect.end(); ++it) // print path to root
-		{
-			//outputfile.seekp(0, std::ios::end);
-			outputfile.write(reinterpret_cast<char*>(&(*it)), sizeof(it));
-			//outputfile << *it; // output path to file
-		}
-		if (!outputfile.good())
-		{
-			std::cout << "Error during writing\n";
-		}
-		outputfile.close();
-	}
 	void calcPathToRootAndAppend(huffNode* node) // start at node and find path back to root
 	{
 		std::string path;
@@ -294,26 +229,22 @@ public:
 		this->strToEncode += path; // append path to strToEncode
 
 	}
-	void printPathAndClear()
+	void printCharAsBin(char tmpCh)
 	{
-		for (std::vector<int>::iterator it = vect.begin(); it != vect.end(); ++it)
-			std::cout << *it;
+		for (int i = 0; i < 8; i++) // convert ascii decimal to string of zeros and ones (binary)
+		{
+			std::cout << !!((tmpCh << i) & 0x80);
+		}
 		std::cout << " ";
-
-		this->vect.clear();
 	}
-	void ultimatePrint()
+	// visualize tree functions
+	void printTree() 
 	{
 		std::cout << std::endl;
 		//std::cout << std::endl;
 		std::cout << "------------------------------------\n";
-		printTree();
-		std::cout << "------------------------------------\n";
-		//std::cout << std::endl;
-		//std::cout << std::endl;
-	}
-	void printTree() {
 		printSubtree(root, 0);
+		std::cout << "------------------------------------\n";
 	}
 	void printSubtree(huffNode* node, int level)
 	{
