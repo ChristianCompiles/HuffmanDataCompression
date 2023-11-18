@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <vector>
 #include "huffTree.h"
 
 int main(int argc, const char* argv[])

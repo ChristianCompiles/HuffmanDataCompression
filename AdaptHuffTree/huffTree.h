@@ -1,7 +1,6 @@
 #include "huffNode.h"
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <bitset>
 #pragma once
 
@@ -13,7 +12,6 @@ private:
 	std::string alphabet = ""; // alphabet used in message
 	std::string readFileName = ""; // file to read from
 	huffNode* zeroNode = nullptr; // store unused characters
-	std::vector<int> vect;
 	huffNode* hashTable[128] = { nullptr }; // has potential to hold all 128 ascii char
 	std::string strToEncode = "";
 public:
@@ -40,6 +38,7 @@ public:
 
 		// aabccdaef
 		std::string bunchLetters = "aabccdaef"; // messes up at 'd' as of 11/09/23
+		std::string binaryStr; // hold string of char ascii in binary
 		int i = 0;
 		char tmpCh;
 
@@ -69,7 +68,7 @@ public:
 
 				this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
 				
-				std::string binaryStr = std::bitset<8>(tmpCh).to_string();
+				binaryStr = std::bitset<8>(tmpCh).to_string();
 				this->strToEncode += binaryStr; // add ch to string to encode 
 				
 				increment(charNode);
@@ -87,9 +86,8 @@ public:
 			}
 			else // char not in tree
 			{
-				// print path to zeroNode and ascii of char
 				calcPathToRootAndAppend(this->zeroNode);
-				std::string binaryStr = std::bitset<8>(tmpCh).to_string();
+				binaryStr = std::bitset<8>(tmpCh).to_string();
 				this->strToEncode += binaryStr; // add ch to string to encode 
 				
 				huffNode* newParent = new huffNode;
