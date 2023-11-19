@@ -15,47 +15,41 @@ private:
 	huffNode* zeroNode = new huffNode; // store unused characters
 	huffNode* hashTable[128] = { nullptr }; // has potential to hold all 128 ascii char
 	std::string strToEncode = "";
+
+	// private member functions
+	huffNode* findLeader(int count, huffNode* node);
+	void nodeSwap(huffNode* node1, huffNode* node2);
+	void increment(huffNode* node);
+	void calcPathToRootAndAppend(huffNode* node);
+	void printCharAsBin(char tmpCh);
+	void printTree();
+	void printSubtree(huffNode* node, int level);
 public:
 	huffTree(){}
-	huffTree(std::string action, std::string msgAlphabet, std::string sourcefile)
-	{
-		this->alphabet = msgAlphabet; 
-		this->readFileName = sourcefile;
-		if (action == "encode")
-		{
-			encode();
-		}
-		else if (action == "decode")
-		{
-			//decode
-		}
-		else
-		{
-			std::cout << "Try again with properly spelled action\n";
-		}
-	}
+	huffTree(std::string passedInMsgAlphabet) { this->alphabet = passedInMsgAlphabet; }
 
-	void encode()
+	void encode(std::string messageToEncode)
 	{
-	
-		std::fstream source(this->readFileName, std::fstream::in);
-		if (!source)
-		{
-			std::cout << "Error opening input file: " << readFileName;
-		}
-
 		// string encoded in lecture: aabccdaef 
 		std::string binaryStr; // hold string of char ascii in binary
-		int i = 0;
+
 		char tmpCh = 0;
 
-		while (!source.get(tmpCh).eof())
+		std::cout << "Alphabet we are working with: " << this->alphabet << std::endl;
+
+		for(int i = 0; i < messageToEncode.length(); i++)
 		{
-			source >> tmpCh;
+			tmpCh = messageToEncode[i];
+
+			if (tmpCh == '\0')
+			{
+				std::cout << "Reached EOF\n";
+			}
 
 			if (tmpCh == 92) // if char read in is backslash:
 			{
-				source >> tmpCh;
+				i++;
+				tmpCh = messageToEncode[i];
 				
 				switch (tmpCh)
 				{
@@ -155,139 +149,5 @@ public:
 
 		std::cout << this->strToEncode << std::endl;
 	}
-
-	void increment(huffNode* node) // pass in node to increment its count, parent count, perform sibling check and necessary remediation
-	{
-		int leaderCount = node->count; // leader has previous count value of node
-		node->count++; // increment count of node passed in
-		
-		if (node->parent) // if parent node exists
-		{
-			if (node->prev) // prev node exists
-			{
-				if (node->count > node->prev->count) // if sibling check fails
-				{
-					huffNode* leader = findLeader(leaderCount, node);
-
-					if (leader->leftChild != node && leader->rightChild != node) // make sure leader isn't parent
-					{
-						nodeSwap(node, leader); // swap node and leader
-						node = leader;
-						increment(node->parent); // increment parent of node after swap
-					}
-					else // leader is parent
-					{
-						increment(node->parent);
-					}
-				}
-				else // sibling check did not fail
-				{
-					increment(node->parent);
-				}
-			}
-		}
-	}
-	huffNode* findLeader(int count, huffNode* node) // find leader with given count
-	{
-		if (node) // make sure it's not a nullptr
-		{
-			while (node->prev != nullptr && node->prev->count == count)
-			{
-				node = node->prev;
-			}
-			return node;
-		}
-		else
-			return nullptr;
-	}
-	void nodeSwap(huffNode* node1, huffNode* node2)
-	{
-		// swap everything but children pointers
-		std::swap(node1->ch, node2->ch);
-		std::swap(node1->count, node2->count);
-		std::swap(node1->leftChild, node2->leftChild);
-		std::swap(node1->rightChild, node2->rightChild);
-
-		if (node1->leftChild)
-		{
-			node1->leftChild->parent = node1;
-		}
-		if(node1->rightChild)
-		{
-			node1->rightChild->parent = node1;
-		}
-		if (node2->leftChild)
-		{
-			node2->leftChild->parent = node2;
-
-		}
-		if (node2->rightChild)
-		{
-			node2->rightChild->parent = node2;
-		}
-
-		// update where table finds values 11/15/23 8:28p
-		if (node1->ch != '0')
-		{
-			this->hashTable[node1->ch] = node1;
-		}
-		if (node2->ch != '0')
-		{
-			this->hashTable[node2->ch] = node2;
-		}
-	}
-	void calcPathToRootAndAppend(huffNode* node) // start at node and find path back to root
-	{
-		std::string path;
-		while (node->parent != nullptr)
-		{
-			if (node->parent->leftChild == node) // if child is left child
-			{
-				path.push_back('0');
-			}
-			else
-			{
-				path.push_back('1');
-
-			}
-			node = node->parent;
-		}
-
-		reverse(path.begin(), path.end());
-		this->strToEncode += path; // append path to strToEncode
-	}
-	void printCharAsBin(char tmpCh)
-	{
-		for (int i = 0; i < 8; i++) // convert ascii decimal to string of zeros and ones (binary)
-		{
-			std::cout << !!((tmpCh << i) & 0x80);
-		}
-		std::cout << " ";
-	}
-	// visualize tree functions
-	void printTree() 
-	{
-		std::cout << std::endl;
-		//std::cout << std::endl;
-		std::cout << "------------------------------------\n";
-		printSubtree(root, 0);
-		std::cout << "------------------------------------\n";
-	}
-	void printSubtree(huffNode* node, int level)
-	{
-		if (node == nullptr)
-		{
-			return;
-		}
-		
-		printSubtree(node->rightChild, level + 1);
-
-		for (int i = 0; i < level; i++)
-		{
-			std::cout << "    ";
-		}
-		std::cout << node->ch << " " << node->count << std::endl;
-
-		printSubtree(node->leftChild, level + 1);
-	}
+	// boid decode(std::string messageToDecode){};
 };

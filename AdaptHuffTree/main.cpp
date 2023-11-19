@@ -11,20 +11,33 @@ int main(int argc, const char* argv[])
 	//	return 1;
 	//}
 
-	//std::string actionWord = argv[1];
-	//std::string alphabetFileName = argv[2];
-	//std::string sourceFile = argv[3];
+	// argv[0] is executable file name
+	// argv[1] is action string (encode or decode)
+	// argv[2] is name of file containing alphabet
+	// argv[3] is name of file containing message to encode or decode
 
-	// read in alphabet from file
-	std::string alphabetFileContent;
-	std::getline(std::ifstream("alphabetfile.txt"), alphabetFileContent, '\0');
-	std::cout << "Alphabet of message: " << alphabetFileContent << std::endl;
-
-	////huffTree tree1(argv[1], argv[2], argv[3]);
-	//huffTree tree3(actionWord, alphabetFileContent, sourceFile);
-	//tree3.encode();
-
+	
+	 
 	// debug test env
-	huffTree tree("encode", alphabetFileContent, "filetoencode.txt");
+	std::string alphabetFileContent; // string to hold contents of file that has alphabet
+	std::string messageFileContent;
+	
+	// read in alphabet from file
+	std::getline(std::ifstream("alphabetfile.txt"), alphabetFileContent, '\0');
+	//std::cout << "Alphabet of message: " << alphabetFileContent << std::endl;
+
+	// read in message from file (txt file)
+	std::getline(std::ifstream("filetoencode"), messageFileContent, '\0');
+
+	huffTree tree(alphabetFileContent); // constructor will take alphabet string as parameter
+	tree.encode(messageFileContent);
+
+	// cmd line env
+	/*if (argv[1] == "encode")
+	{tree.encode(messageFileContent);}*/
+	/*if(argv[1] == "decode")
+	{tree.decode();
+	}*/
+
 	return 0;
 }
