@@ -132,7 +132,16 @@ void huffTree::printSubtree(huffNode* node, int level)
 	{
 		std::cout << "    ";
 	}
-	std::cout << node->ch << " " << node->count << std::endl;
-
+	switch (node->ch)
+	{
+	case '\n': std::cout << "\\n" << " " << node->count << std::endl;
+		break;
+	case '\t': std::cout << "\\t" << " " << node->count << std::endl;
+		break;
+	case '\\': std::cout << "\\" << " " << node->count << std::endl;
+		break;
+	default: std::cout << node->ch << " " << node->count << std::endl;
+	}
+	
 	printSubtree(node->leftChild, level + 1);
 }

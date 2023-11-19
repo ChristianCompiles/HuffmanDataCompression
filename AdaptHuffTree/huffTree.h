@@ -1,9 +1,11 @@
+#pragma once
 #include "huffNode.h"
 #include <iostream>
 #include <algorithm>
 #include <fstream>
+#include <vector>
 #include <bitset>
-#pragma once
+
 
 class huffTree
 {
@@ -11,6 +13,7 @@ private:
 
 	huffNode* root = nullptr; // root of the tree
 	std::string alphabet = ""; // alphabet used in message
+	std::vector <char> alphabetArray;
 	std::string readFileName = ""; // file to read from
 	huffNode* zeroNode = new huffNode; // store unused characters
 	huffNode* hashTable[128] = { nullptr }; // has potential to hold all 128 ascii char
@@ -36,8 +39,31 @@ public:
 		char tmpCh = 0;
 
 		std::cout << "Alphabet we are working with: " << this->alphabet << std::endl;
+		
+		for (int i = 0; i < this->alphabet.size(); i++)
+		{
+			if (alphabet[i] == 92) // if backslash encountered
+			{
+				i++; // look to next character
+				switch (alphabet[i])
+				{
+				case 'n': alphabetArray.push_back('\n');
+					break;
+				case 't': alphabetArray.push_back('\t');
+					break;
+				case '\\': alphabetArray.push_back('\\');
+					break;
+					}
+			}
+			else
+			{
+				alphabetArray.push_back(alphabet[i]);
+			}
+			
+		}
 
-		for(int i = 0; i < messageToEncode.length(); i++)
+		int i = 0;
+		while (i < messageToEncode.length())
 		{
 			tmpCh = messageToEncode[i];
 
@@ -45,32 +71,23 @@ public:
 			{
 				std::cout << "Reached EOF\n";
 			}
-
-			if (tmpCh == 92) // if char read in is backslash:
+		
+			bool flag = 0;
+			for (std::vector<char>::iterator it = alphabetArray.begin(); it != alphabetArray.end(); ++it)
 			{
-				i++;
-				tmpCh = messageToEncode[i];
-				
-				switch (tmpCh)
+				if (tmpCh == *it)
 				{
-				case 'n': tmpCh = '\n';
-					break;
-				case 't': tmpCh = '\t';
-					break;
-				case '\\': tmpCh = '\\';
+					flag = 1;
 					break;
 				}
-				
 			}
-		
-			// make sure tmpCh is in alphabet
-			if(this->alphabet.find(tmpCh) == std::string::npos) // not found
-			{
-				std::cout << "Character to encode not in given alphabet\n";
-				return;
-			} 
+			if (!flag) 
+			{ 
+				std::cout << "Char in message that is not in alphabet\n";
+				return; 
+			}
 
-			//printTree();
+			printTree();
 			
 			if (!root) // if tree empty
 			{
@@ -142,12 +159,11 @@ public:
 
 				increment(charNode);
 			}
-			
 			i++;
-			//printTree();
+			printTree();
 		}
 
 		std::cout << this->strToEncode << std::endl;
 	}
-	// boid decode(std::string messageToDecode){};
+	// void decode(std::string messageToDecode){};
 };

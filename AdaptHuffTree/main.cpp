@@ -24,20 +24,19 @@ int main(int argc, const char* argv[])
 	
 	// read in alphabet from file
 	std::getline(std::ifstream("alphabetfile.txt"), alphabetFileContent, '\0');
-	//std::cout << "Alphabet of message: " << alphabetFileContent << std::endl;
+	std::cout << "Alphabet of message: " << alphabetFileContent << "\n";
 
 	// read in message from file (txt file)
-	std::getline(std::ifstream("filetoencode"), messageFileContent, '\0');
+	std::getline(std::ifstream("filetoencode.txt"), messageFileContent, '\0');
+	std::cout << "Message to encode: " << messageFileContent << "\n";
 
 	huffTree tree(alphabetFileContent); // constructor will take alphabet string as parameter
 	tree.encode(messageFileContent);
-
-	// cmd line env
-	/*if (argv[1] == "encode")
-	{tree.encode(messageFileContent);}*/
-	/*if(argv[1] == "decode")
-	{tree.decode();
-	}*/
-
+	
+	//// cmd line env
+	//if (argv[1] == "encode")
+	//{
+	//	tree.encode(messageFileContent);
+	//}
 	return 0;
 }

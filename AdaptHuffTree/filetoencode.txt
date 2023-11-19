@@ -1,1 +1,2 @@
-thisthefiletoencode
+aabc
+cda	ef
