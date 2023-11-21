@@ -140,7 +140,7 @@ public:
 	void decode(std::string messageToDecode)
 	{
 		std::string binaryStr; // hold string of char ascii in binary
-		std::vector<int> eightBitVector;
+		std::vector<char> eightBitVector;
 		char tmpCh = 0;
 		int i = 0;
 
@@ -176,8 +176,6 @@ public:
 
 				this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
 
-				binaryStr = std::bitset<8>(tmpCh).to_string();
-				this->strToEncode += binaryStr; // add ch to string to encode 
 
 				increment(charNode);
 				i++;
@@ -249,17 +247,17 @@ public:
 		}
 	}
 
-	int eightBitsToAscii(std::vector<int> eightBitPath)
+	int eightBitsToAscii(std::vector<char> eightBitPath)
 	{
-		int total= 0;
+		int total = 0;
 		int count = 0;
-		for (std::vector<int>::iterator it = eightBitPath.begin(); it != eightBitPath.end(); ++it)
+		for (std::vector<char>::iterator it = eightBitPath.begin(); it != eightBitPath.end(); ++it)
 		{
-			if (*it == 0)
+			if (*it == '0')
 				continue;
 			else
 			{
-				count += std::pow(2,count);
+				total += std::pow(2,8-count);
 			}
 			count++;
 		}
