@@ -2,6 +2,32 @@
 #include <iostream>
 #include <algorithm>
 
+void huffTree::setUpAlphabetArray()
+{
+	std::cout << "Alphabet we are working with: " << this->alphabet << std::endl;
+
+	for (int i = 0; i < this->alphabet.size(); i++)
+	{
+		if (alphabet[i] == 92) // if backslash encountered
+		{
+			i++; // look to next character
+			switch (alphabet[i])
+			{
+			case 'n': alphabetArray.push_back('\n');
+				break;
+			case 't': alphabetArray.push_back('\t');
+				break;
+			case '\\': alphabetArray.push_back('\\');
+				break;
+			}
+		}
+		else
+		{
+			alphabetArray.push_back(alphabet[i]);
+		}
+	}
+}
+
 huffNode* huffTree::findLeader(int count, huffNode* node) // find leader with given count
 {
 	if (node) // make sure it's not a nullptr

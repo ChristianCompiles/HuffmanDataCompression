@@ -1,2 +1,1 @@
-aabc
-cda	ef
+aabccdaef
