@@ -150,9 +150,10 @@ public:
 
 			if (!root) // if tree empty
 			{
-				for (int i = 0; i < 8; i++)
+				for (int j = 0; j < 8; j++)
 				{
-					eightBitVector.push_back(messageToDecode[i]);
+					eightBitVector.push_back(messageToDecode[j]);
+					i++;
 				}
 				tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
 				eightBitVector.clear();
@@ -196,14 +197,17 @@ public:
 					{
 						node = node->rightChild;
 					}
+					i++;
 				}
 				if (node->ch == '0') // if the node is the zero Node
 				{
-					for (int i = 0; i < 8; i++)
+					for (int j = 0; j < 8; j++)
 					{
-						eightBitVector.push_back(messageToDecode[i]);
+						eightBitVector.push_back(messageToDecode[j]);
+						i++;
 					}
 					tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
+					
 					eightBitVector.clear();
 
 					huffNode* newParent = new huffNode;
@@ -238,7 +242,9 @@ public:
 				{
 					increment(node);
 				}
+
 			}
+			std::cout << tmpCh;
 			i++;			
 		}
 	}
