@@ -142,17 +142,16 @@ public:
 		std::string binaryStr; // hold string of char ascii in binary
 		std::vector<char> eightBitVector;
 		char tmpCh = 0;
+		std::string charMessage;
 		int i = 0;
 
 		while (i < messageToDecode.length())
 		{
-			printTree();
-
 			if (!root) // if tree empty
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					eightBitVector.push_back(messageToDecode[j]);
+					eightBitVector.push_back(messageToDecode[i]);
 					i++;
 				}
 				tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
@@ -178,7 +177,9 @@ public:
 
 
 				increment(charNode);
-				i++;
+				//i++;
+				charMessage.push_back(tmpCh);
+				std::cout << charMessage;
 				continue;
 			}
 
@@ -201,11 +202,10 @@ public:
 				{
 					for (int j = 0; j < 8; j++)
 					{
-						eightBitVector.push_back(messageToDecode[j]);
+						eightBitVector.push_back(messageToDecode[i]);
 						i++;
 					}
 					tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
-					
 					eightBitVector.clear();
 
 					huffNode* newParent = new huffNode;
@@ -242,8 +242,11 @@ public:
 				}
 
 			}
-			std::cout << tmpCh;
-			i++;			
+			printTree();
+
+			charMessage.push_back(tmpCh);
+			std::cout << charMessage;
+			//i++;			
 		}
 	}
 
@@ -254,10 +257,14 @@ public:
 		for (std::vector<char>::iterator it = eightBitPath.begin(); it != eightBitPath.end(); ++it)
 		{
 			if (*it == '0')
+			{
+				count++;
 				continue;
+			}
+				
 			else
 			{
-				total += std::pow(2,8-count);
+				total += std::pow(2,7-count);
 			}
 			count++;
 		}
