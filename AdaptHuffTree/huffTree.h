@@ -23,7 +23,6 @@ private:
 	void increment(huffNode* node);
 	void calcPathToRootAndAppend(huffNode* node);
 	int eightBitsToAscii(std::vector<char> eightBitPath);
-	void printCharAsBin(char tmpCh);
 	void writeStringtoBinaryFile();
 	void printTree();
 	void printSubtree(huffNode* node, int level);

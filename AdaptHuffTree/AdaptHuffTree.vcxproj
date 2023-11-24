@@ -132,7 +132,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="compareResults.txt" />
-    <Text Include="PseudpAdaptiveHuffman.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="huffNode.h" />

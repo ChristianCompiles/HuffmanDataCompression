@@ -107,7 +107,7 @@ void huffTree::encode(std::string messageToEncode)
 		printTree();
 	}
 
-	std::cout << this->strToEncode << std::endl;
+	std::cout << "Encoding of tree: " << this->strToEncode << std::endl;
 	writeStringtoBinaryFile();
 }
 void huffTree::decode(std::string messageToDecode)
@@ -231,42 +231,58 @@ void huffTree::writeStringtoBinaryFile()
 {
 	// package message into bytes to write to binary file
 	std::ofstream writeFile(this->readFileName + ".encoded", std::ios::binary);
-	// std::bitset<8> eightBits;
 
 	int lenLastByte = strToEncode.length() % 8;
-	std::cout << "\nlength of string to encode: " << strToEncode.length() << std::endl;
-	std::cout << "length of last byte: " << lenLastByte << std::endl;
+	std::cout << "Length of encoding: " << strToEncode.length() << std::endl;
+	std::cout << "Length of last byte: " << lenLastByte << std::endl;
+	 
 	std::string stringbinRepofLenLastByte = std::bitset<3>(lenLastByte).to_string();
-	
+	std::cout << "Bin rep of len of last byte: " << stringbinRepofLenLastByte << std::endl;
+
 	std::string lenPlusEncoding = stringbinRepofLenLastByte + strToEncode; // first 3 bits hold length of last byte
 	std::cout << "len + encoding: " << lenPlusEncoding << std::endl;
+	int writecount = 0;
+	char manipChar = 0; // char that we will set the bits of
+	std::string checkbitsagain;
 
-	for (int i = 0; i < lenPlusEncoding.size(); i++) // iterate through entire encoding string
+	for (int i = 0; i < lenPlusEncoding.size();) // iterate through entire encoding string
 	{
-		std::bitset<8> eightBits; // initialized to all zeros
-		for (int j = 0; j < 8; j++) // package up encoding into bytes
+		for (int j = 0; j < 8; j++) // set bits of char to represent the byte package to encode
 		{
-			if (i == lenPlusEncoding.length()) // if we have reached end of string
-				break;
-
-			if (lenPlusEncoding[i] == '0')
+			if (lenPlusEncoding[i] == '1') // set bit to 1
 			{
-				eightBits[j] = 0;
+				manipChar |= 1 << (7 - j);
 			}
-			else
-			{
-				eightBits[j] = 1;
-			}
-			i++;
+			i++;		
 		}
-		writeFile.write(reinterpret_cast<char*>(&eightBits), sizeof(eightBits));
+		
+		std::cout << "Byte " << (i / 8) << " " << std::bitset<8>(manipChar).to_string() << std::endl;
+		checkbitsagain += std::bitset<8>(manipChar).to_string();
+		writecount++;
+
+		writeFile.write(reinterpret_cast<char*>(&manipChar), sizeof(manipChar));
+		manipChar = 0; // reset bits to 0
 	}
+	std::cout << "Write count: " << writecount << std::endl;
+	std::cout << "Check bits again " << checkbitsagain << std::endl;
 	writeFile.close();
 }
 int huffTree::eightBitsToAscii(std::vector<char> eightBitPath)
 {
 	int total = 0;
 	int count = 0;
+	
+	/*eightBitPath.resize(12);
+	for (int i = 0; i < eightBitPath.size(); i++)
+	{
+		if (eightBitPath[i] == '0')
+			continue;
+		else
+		{
+			total += (int)std::pow(2, 7 - i);
+		}
+	}
+	std::cout << "size of eightBitPath after resize: " << eightBitPath.size();*/
 	for (std::vector<char>::iterator it = eightBitPath.begin(); it != eightBitPath.end(); ++it)
 	{
 		if (*it == '0')
@@ -277,7 +293,7 @@ int huffTree::eightBitsToAscii(std::vector<char> eightBitPath)
 
 		else
 		{
-			total += std::pow(2, 7 - count);
+			total += (int)std::pow(2, 7 - count);
 		}
 		count++;
 	}
@@ -406,14 +422,6 @@ void huffTree::calcPathToRootAndAppend(huffNode* node) // start at node and find
 
 	reverse(path.begin(), path.end());
 	this->strToEncode += path; // append path to strToEncode
-}
-void huffTree::printCharAsBin(char tmpCh)
-{
-	for (int i = 0; i < 8; i++) // convert ascii decimal to string of zeros and ones (binary)
-	{
-		std::cout << !!((tmpCh << i) & 0x80);
-	}
-	std::cout << " ";
 }
 // visualize tree functions
 void huffTree::printTree()
