@@ -12,7 +12,6 @@ void huffTree::encode(std::string messageToEncode)
 	char tmpCh = 0;
 	int i = 0;
 
-	//std::cout << std::endl;
 	while (i < messageToEncode.length())
 	{
 		tmpCh = messageToEncode[i];
@@ -56,9 +55,6 @@ void huffTree::encode(std::string messageToEncode)
 
 			binaryStr = std::bitset<8>(tmpCh).to_string(); // represent the char in its ascii binary
 			this->strToEncode += binaryStr; // add ch to string to encode 
-
-			/*encodingWithSpaces += binaryStr;
-			encodingWithSpaces += " ";*/
 
 			increment(charNode);
 			i++;
@@ -112,17 +108,148 @@ void huffTree::encode(std::string messageToEncode)
 	}
 
 	std::cout << this->strToEncode << std::endl;
+	writeStringtoBinaryFile();
+}
+void huffTree::decode(std::string messageToDecode)
+{
+	std::string binaryStr; // hold string of char ascii in binary
+	std::vector<char> eightBitVector;
+	char tmpCh = 0;
+	std::string charMessage;
+	int i = 0;
+
+	while (i < messageToDecode.length())
+	{
+		printTree();
+
+		if (!root) // if tree empty
+		{
+			for (int j = 0; j < 8; j++)
+			{
+				eightBitVector.push_back(messageToDecode[i]);
+				i++;
+			}
+			tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
+			std::cout << "Empty tree first char: " << tmpCh << std::endl;
+			eightBitVector.clear();
+
+			huffNode* parent = new huffNode;
+			huffNode* charNode = new huffNode(tmpCh);
+
+			parent->leftChild = this->zeroNode;
+			parent->rightChild = charNode;
+
+			this->zeroNode->parent = parent;
+			this->zeroNode->prev = charNode;
+			this->zeroNode->next = nullptr;
+
+			this->root = parent;
+
+			charNode->parent = this->root;
+			charNode->next = zeroNode;
+			charNode->prev = parent;
+
+			this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
+
+			increment(charNode);
+			
+			charMessage.push_back(tmpCh);
+			std::cout << charMessage;
+			continue;
+		}
+
+		huffNode* node = this->root;
+		if (node != nullptr)
+		{
+			while (node->leftChild != nullptr || node->rightChild != nullptr) // take in binary from message until we reach a leaf node
+			{
+				if (messageToDecode[i] == '0') // travel down left path
+				{
+					node = node->leftChild;
+				}
+				else // travel down right path
+				{
+					node = node->rightChild;
+				}
+				i++;
+			}
+			if (node->ch == '0') // if the node is the zero Node
+			{
+				for (int j = 0; j < 8; j++)
+				{
+					eightBitVector.push_back(messageToDecode[i]);
+					i++;
+				}
+				tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
+				std::cout << "we are going to make a node with char: " << tmpCh << std::endl;
+				eightBitVector.clear();
+
+				huffNode* newParent = new huffNode;
+				huffNode* charNode = new huffNode(tmpCh);
+				huffNode* zeroNodePrev = this->zeroNode->prev;
+				huffNode* zeroNodeParent = this->zeroNode->parent;
+
+				// newParent pointer adjustment
+				newParent->leftChild = this->zeroNode;
+				newParent->rightChild = charNode;
+				newParent->prev = this->zeroNode->prev;
+				newParent->next = charNode;
+				newParent->parent = this->zeroNode->parent;
+
+				zeroNodeParent->leftChild = newParent;
+
+				zeroNodePrev->next = newParent;
+
+				this->zeroNode->parent = newParent;
+				this->zeroNode->prev = charNode;
+				this->zeroNode->next = nullptr;
+
+				charNode->parent = newParent;
+				charNode->next = this->zeroNode;
+				charNode->prev = newParent;
+
+				this->hashTable[tmpCh] = charNode;
+
+				increment(charNode);
+			}
+			else // node is char node
+			{
+				tmpCh = node->ch;
+				std::cout << "Char: " << tmpCh << " was found\n";
+
+				increment(node);
+			}
+
+		}
+		printTree();
+
+		charMessage.push_back(tmpCh);
+		std::cout << charMessage;			
+	}
 }
 void huffTree::writeStringtoBinaryFile()
 {
-	std::ofstream writeFile(this->readFileName + ".encoded", std::fstream::in);
-	std::bitset<8> eightBits;
+	// package message into bytes to write to binary file
+	std::ofstream writeFile(this->readFileName + ".encoded", std::ios::binary);
+	// std::bitset<8> eightBits;
 
-	for (int i = 0; i < strToEncode.size(); i++)//iterate through entire encoding string
+	int lenLastByte = strToEncode.length() % 8;
+	std::cout << "\nlength of string to encode: " << strToEncode.length() << std::endl;
+	std::cout << "length of last byte: " << lenLastByte << std::endl;
+	std::string stringbinRepofLenLastByte = std::bitset<3>(lenLastByte).to_string();
+	
+	std::string lenPlusEncoding = stringbinRepofLenLastByte + strToEncode; // first 3 bits hold length of last byte
+	std::cout << "len + encoding: " << lenPlusEncoding << std::endl;
+
+	for (int i = 0; i < lenPlusEncoding.size(); i++) // iterate through entire encoding string
 	{
+		std::bitset<8> eightBits; // initialized to all zeros
 		for (int j = 0; j < 8; j++) // package up encoding into bytes
 		{
-			if (strToEncode[i] == '0')
+			if (i == lenPlusEncoding.length()) // if we have reached end of string
+				break;
+
+			if (lenPlusEncoding[i] == '0')
 			{
 				eightBits[j] = 0;
 			}
@@ -134,6 +261,7 @@ void huffTree::writeStringtoBinaryFile()
 		}
 		writeFile.write(reinterpret_cast<char*>(&eightBits), sizeof(eightBits));
 	}
+	writeFile.close();
 }
 int huffTree::eightBitsToAscii(std::vector<char> eightBitPath)
 {
@@ -278,8 +406,6 @@ void huffTree::calcPathToRootAndAppend(huffNode* node) // start at node and find
 
 	reverse(path.begin(), path.end());
 	this->strToEncode += path; // append path to strToEncode
-	/*encodingWithSpaces += path;
-	encodingWithSpaces += " ";*/
 }
 void huffTree::printCharAsBin(char tmpCh)
 {
