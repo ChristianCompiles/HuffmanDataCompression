@@ -127,9 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="huffTree.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="compareResults.txt" />
     <Text Include="PseudpAdaptiveHuffman.txt" />
   </ItemGroup>
   <ItemGroup>

@@ -18,9 +18,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="huffTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="PseudpAdaptiveHuffman.txt" />
+    <Text Include="compareResults.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="huffNode.h">
