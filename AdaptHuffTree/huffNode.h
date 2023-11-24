@@ -3,7 +3,6 @@
 class huffNode
 {
 public:
-
 	int count = 0;
 	char ch = '0';
 	huffNode* parent = nullptr; // point to parent if applicable

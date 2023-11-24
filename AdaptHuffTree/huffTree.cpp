@@ -1,7 +1,160 @@
+#pragma once
 #include "huffTree.h"
 #include <iostream>
+#include <fstream>
 #include <algorithm>
+#include <cmath>
 
+void huffTree::encode(std::string messageToEncode)
+{
+	// string encoded in lecture: aabccdaef 
+	std::string binaryStr; // hold string of char ascii in binary
+	char tmpCh = 0;
+	int i = 0;
+
+	//std::cout << std::endl;
+	while (i < messageToEncode.length())
+	{
+		tmpCh = messageToEncode[i];
+		std::cout << "Char to encode: " << tmpCh << std::endl;
+		bool flag = 0;
+		for (std::vector<char>::iterator it = alphabetArray.begin(); it != alphabetArray.end(); ++it)
+		{
+			if (tmpCh == *it)
+			{
+				flag = 1; // char was found in alphabetArray
+				break;
+			}
+		}
+		if (!flag)
+		{
+			std::cout << "Char in message that is not in alphabet\n";
+			return;
+		}
+
+		printTree();
+
+		if (!root) // if tree empty
+		{
+			huffNode* parent = new huffNode;
+			huffNode* charNode = new huffNode(tmpCh);
+
+			parent->leftChild = this->zeroNode;
+			parent->rightChild = charNode;
+
+			this->zeroNode->parent = parent;
+			this->zeroNode->prev = charNode;
+			this->zeroNode->next = nullptr;
+
+			this->root = parent;
+
+			charNode->parent = this->root;
+			charNode->next = zeroNode;
+			charNode->prev = parent;
+
+			this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
+
+			binaryStr = std::bitset<8>(tmpCh).to_string(); // represent the char in its ascii binary
+			this->strToEncode += binaryStr; // add ch to string to encode 
+
+			/*encodingWithSpaces += binaryStr;
+			encodingWithSpaces += " ";*/
+
+			increment(charNode);
+			i++;
+			continue;
+		}
+
+		// logic for non-empty tree
+		huffNode* foundNode = this->hashTable[tmpCh]; // get address of node containing that character
+
+		if (foundNode) // node w/ char has address, so its been found in tree
+		{
+			calcPathToRootAndAppend(foundNode); // find path to root from char
+			increment(foundNode); // performs parent increment and necessary remeditations
+		}
+		else // char not in tree
+		{
+			calcPathToRootAndAppend(this->zeroNode);
+			binaryStr = std::bitset<8>(tmpCh).to_string();
+			this->strToEncode += binaryStr; // add ch to string to encode 
+
+			huffNode* newParent = new huffNode;
+			huffNode* charNode = new huffNode(tmpCh);
+			huffNode* zeroNodePrev = this->zeroNode->prev;
+			huffNode* zeroNodeParent = this->zeroNode->parent;
+
+			// newParent pointer adjustment
+			newParent->leftChild = this->zeroNode;
+			newParent->rightChild = charNode;
+			newParent->prev = this->zeroNode->prev;
+			newParent->next = charNode;
+			newParent->parent = this->zeroNode->parent;
+
+			zeroNodeParent->leftChild = newParent;
+
+			zeroNodePrev->next = newParent;
+
+			this->zeroNode->parent = newParent;
+			this->zeroNode->prev = charNode;
+			this->zeroNode->next = nullptr;
+
+			charNode->parent = newParent;
+			charNode->next = this->zeroNode;
+			charNode->prev = newParent;
+
+			this->hashTable[tmpCh] = charNode;
+
+			increment(charNode);
+		}
+		i++;
+		printTree();
+	}
+
+	std::cout << this->strToEncode << std::endl;
+}
+void huffTree::writeStringtoBinaryFile()
+{
+	std::ofstream writeFile(this->readFileName + ".encoded", std::fstream::in);
+	std::bitset<8> eightBits;
+
+	for (int i = 0; i < strToEncode.size(); i++)//iterate through entire encoding string
+	{
+		for (int j = 0; j < 8; j++) // package up encoding into bytes
+		{
+			if (strToEncode[i] == '0')
+			{
+				eightBits[j] = 0;
+			}
+			else
+			{
+				eightBits[j] = 1;
+			}
+			i++;
+		}
+		writeFile.write(reinterpret_cast<char*>(&eightBits), sizeof(eightBits));
+	}
+}
+int huffTree::eightBitsToAscii(std::vector<char> eightBitPath)
+{
+	int total = 0;
+	int count = 0;
+	for (std::vector<char>::iterator it = eightBitPath.begin(); it != eightBitPath.end(); ++it)
+	{
+		if (*it == '0')
+		{
+			count++;
+			continue;
+		}
+
+		else
+		{
+			total += std::pow(2, 7 - count);
+		}
+		count++;
+	}
+	return total;
+}
 void huffTree::setUpAlphabetArray()
 {
 	std::cout << "Alphabet we are working with: " << this->alphabet << std::endl;
@@ -27,7 +180,6 @@ void huffTree::setUpAlphabetArray()
 		}
 	}
 }
-
 huffNode* huffTree::findLeader(int count, huffNode* node) // find leader with given count
 {
 	if (node) // make sure it's not a nullptr
@@ -110,7 +262,7 @@ void huffTree::increment(huffNode* node) // pass in node to increment its count,
 }
 void huffTree::calcPathToRootAndAppend(huffNode* node) // start at node and find path back to root
 {
-	std::string path;
+	std::string path = "";
 	while (node->parent != nullptr)
 	{
 		if (node->parent->leftChild == node) // if child is left child
@@ -120,13 +272,14 @@ void huffTree::calcPathToRootAndAppend(huffNode* node) // start at node and find
 		else
 		{
 			path.push_back('1');
-
 		}
 		node = node->parent;
 	}
 
 	reverse(path.begin(), path.end());
 	this->strToEncode += path; // append path to strToEncode
+	/*encodingWithSpaces += path;
+	encodingWithSpaces += " ";*/
 }
 void huffTree::printCharAsBin(char tmpCh)
 {
