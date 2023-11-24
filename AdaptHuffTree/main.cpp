@@ -27,46 +27,42 @@ int main(int argc, const char* argv[])
 	// debug test env
 	std::string alphabetFileContent; // string to hold contents of file that has alphabet
 	std::string messageFileContent;
-	int option = 3;
+	int option = 2;
 	
 	// read in alphabet from file
 	std::getline(std::ifstream("alphabetfile.txt"), alphabetFileContent, '\0');
 	std::cout << "Alphabet of message: " << alphabetFileContent << "\n";
 
 	huffTree tree(alphabetFileContent); // constructor will take alphabet string as parameter
-	
-	if (option == 1) // encode to binary file
+	huffTree decodeTree(alphabetFileContent);
+	if (option == 2) // encode to binary file
 	{
 		// read in message to encode from file (txt file)
 		std::getline(std::ifstream("filetoencode.txt"), messageFileContent, '\0');
 		std::cout << "Message to encode: " << messageFileContent << "\n";
 		tree.encode(messageFileContent);
-	}
-	if (option == 2) // decode string of 1s and 0s
-	{
-		// read in message to decode from file (txt file)
-		std::getline(std::ifstream("filetodecode.txt"), messageFileContent, '\0');
-		std::cout << "Message to decode: " << messageFileContent << "\n";
-		tree.decode(messageFileContent);
-	}
-	if (option == 3)
-	{
+	
 		std::ifstream inputFile(".encoded", std::ios::binary);
 		std::string stringOfBinaryToDecode;
 		char byte;
-		std::bitset<8> binaryrepofbyte;
 
 		while (inputFile.read(&byte, 1)) 
 		{
 			// Process the byte as needed
-			std::cout << "Read byte: " << static_cast<int>(byte) << std::endl;
-			printCharAsBin(byte);
+			//std::cout << "Read byte: " << std::bitset<8>(byte).to_string() << std::endl;
+			stringOfBinaryToDecode += std::bitset<8>(byte).to_string();
 		}
-		/*binaryrepofbyte.
-		stringOfBinaryToDecode += byte;
-		std::cout << "\nString of binary to decode: " << stringOfBinaryToDecode << std::endl;*/
+		std::cout << "Message to decode: " << stringOfBinaryToDecode << std::endl;
+		decodeTree.decode(stringOfBinaryToDecode);
 	}
 	
+	if (option == 3) // decode string of 1s and 0s
+	{
+		// read in message to decode from file (txt file)
+		std::getline(std::ifstream(".encoded"), messageFileContent, '\0');
+		std::cout << "Message to decode: " << messageFileContent << "\n";
+		tree.decode(messageFileContent);
+	}
 	//// cmd line env
 	//if (argv[1] == "encode")
 	//{
