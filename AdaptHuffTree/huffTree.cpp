@@ -1,4 +1,3 @@
-#pragma once
 #include "huffTree.h"
 #include <iostream>
 #include <fstream>
@@ -7,16 +6,16 @@
 
 void huffTree::encode(std::string messageToEncode)
 {
-	// string encoded in lecture: aabccdaef 
-	std::string binaryStr; // hold string of char ascii in binary
-	char tmpCh = 0;
-	int i = 0;
+	// string encoded in lecture: aabccdaef
+	char tmpCh = 0; // hold char of message while looping through message
+	int i = 0; // iterate through message to encode
 
 	while (i < messageToEncode.length())
 	{
 		tmpCh = messageToEncode[i];
 		std::cout << "Char to encode: " << tmpCh << std::endl;
 		bool flag = 0;
+		
 		for (std::vector<char>::iterator it = alphabetArray.begin(); it != alphabetArray.end(); ++it)
 		{
 			if (tmpCh == *it)
@@ -53,8 +52,7 @@ void huffTree::encode(std::string messageToEncode)
 
 			this->hashTable[tmpCh] = charNode; // place address of char in tree into hashtable
 
-			binaryStr = std::bitset<8>(tmpCh).to_string(); // represent the char in its ascii binary
-			this->strToEncode += binaryStr; // add ch to string to encode 
+			this->strToEncode += std::bitset<8>(tmpCh).to_string(); // convert char to string of binary and append to strToEncode
 
 			increment(charNode);
 			i++;
@@ -72,8 +70,8 @@ void huffTree::encode(std::string messageToEncode)
 		else // char not in tree
 		{
 			calcPathToRootAndAppend(this->zeroNode);
-			binaryStr = std::bitset<8>(tmpCh).to_string();
-			this->strToEncode += binaryStr; // add ch to string to encode 
+		
+			this->strToEncode += std::bitset<8>(tmpCh).to_string(); // add char to string to encode 
 
 			huffNode* newParent = new huffNode;
 			huffNode* charNode = new huffNode(tmpCh);
@@ -279,8 +277,8 @@ void huffTree::decode(std::string messageToDecode)
 void huffTree::writeStringtoBinaryFile()
 {
 	// package message into bytes to write to binary file
-	std::ofstream writeFile(this->readFileName + ".encoded", std::ios::binary);
-
+	std::ofstream writeFile(this->inputtedFileName + ".encoded", std::ios::binary);
+	std::cout << "Writing to file " << this->inputtedFileName + ".encoded\n";
 	int lenLastByte = (strToEncode.length()+3) % 8; // add three because we will have 3 bits for length of last byte
 	std::cout << "Length of encoding: " << strToEncode.length() << std::endl;
 	std::cout << "Length of last byte: " << lenLastByte << std::endl;
@@ -319,7 +317,7 @@ void huffTree::writeStringtoBinaryFile()
 	std::cout << "Check bits again:  " << checkbitsagain << std::endl;
 	writeFile.close();
 }
-int huffTree::eightBitsToAscii(std::vector<char> eightBitPath)
+int huffTree::eightBitsToAscii(std::vector<char> &eightBitPath)
 {
 	int total = 0;
 	int count = 0;
