@@ -13,7 +13,7 @@ void huffTree::encode(std::string messageToEncode)
 	while (i < messageToEncode.length())
 	{
 		tmpCh = messageToEncode[i];
-		std::cout << "Char to encode: " << tmpCh << std::endl;
+		//std::cout << "Char to encode: " << tmpCh << std::endl;
 		bool flag = 0;
 		
 		for (std::vector<char>::iterator it = alphabetArray.begin(); it != alphabetArray.end(); ++it)
@@ -105,7 +105,7 @@ void huffTree::encode(std::string messageToEncode)
 		//printTree();
 	}
 
-	std::cout << "Encoding of tree: " << this->strToEncode << std::endl;
+	//std::cout << "Encoding of tree: " << this->strToEncode << std::endl;
 	writeStringtoBinaryFile();
 }
 void huffTree::decode(std::string messageToDecode)
@@ -132,11 +132,11 @@ void huffTree::decode(std::string messageToDecode)
 		i++;
 	}
 	lenLastByte = (int)threeBit.to_ullong();
-	std::cout << "Last byte len in decode funct: " << lenLastByte << std::endl;
-	std::cout << "At position: " << i << " with total positions: " << messageToDecode.length() << std::endl;
+	//std::cout << "Last byte len in decode funct: " << lenLastByte << std::endl;
+	//std::cout << "At position: " << i << " with total positions: " << messageToDecode.length() << std::endl;
 	while (i < (messageToDecode.length() - (8-lenLastByte)))
 	{
-		printTree();
+		//printTree();
 
 		if (!root) // if tree empty
 		{
@@ -146,7 +146,7 @@ void huffTree::decode(std::string messageToDecode)
 				i++;
 			}
 			tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
-			std::cout << "Empty tree first char: " << tmpCh << std::endl;
+			//std::cout << "Empty tree first char: " << tmpCh << std::endl;
 			eightBitVector.clear();
 
 			huffNode* parent = new huffNode;
@@ -170,7 +170,7 @@ void huffTree::decode(std::string messageToDecode)
 			increment(charNode);
 			
 			charMessage.push_back(tmpCh);
-			std::cout << charMessage;
+			//std::cout << charMessage;
 			continue;
 		}
 
@@ -207,7 +207,7 @@ void huffTree::decode(std::string messageToDecode)
 					}
 				}
 				tmpCh = eightBitsToAscii(eightBitVector); // convert binary to int and store as char
-				std::cout << "we are going to make a node with char: " << tmpCh << std::endl;
+				//std::cout << "we are going to make a node with char: " << tmpCh << std::endl;
 				eightBitVector.clear();
 
 				huffNode* newParent = new huffNode;
@@ -241,53 +241,37 @@ void huffTree::decode(std::string messageToDecode)
 			else // node is char node
 			{
 				tmpCh = node->ch;
-				std::cout << "Char: " << tmpCh << " was found\n";
+				//std::cout << "Char: " << tmpCh << " was found\n";
 
 				increment(node);
 			}
 		}
-		printTree();
+		//printTree();
 
 		charMessage.push_back(tmpCh);
-		std::cout << "Message up to this point: " << charMessage << std::endl;
+		//std::cout << "Message up to this point: " << charMessage << std::endl;
 	}
-	std::cout << "We are at position " << i << " with total positions: " << messageToDecode.length() << std::endl;
-	
-	//if (lenLastByte > 0) // if we have a portion of a byte to take care of
-	//{
-	//	huffNode* tmpNode = this->root;
-	//	for (int j = 0; j < lenLastByte; j++)
-	//	{
-	//		if (messageToDecode[i] == '0') // travel down left path
-	//		{
-	//			tmpNode = tmpNode->leftChild;
-	//		}
-	//		else // travel down right path
-	//		{
-	//			tmpNode = tmpNode->rightChild;
-	//		}
-	//		i++;
-	//	}
-	//	tmpCh = tmpNode->ch;
+	//std::cout << "We are at position " << i << " with total positions: " << messageToDecode.length() << std::endl;
 
-	//	charMessage.push_back(tmpCh);
-	//	std::cout << "Message up to this point: " << charMessage << std::endl;
-	//}
+	std::ofstream writeFile(this->inputtedFileName + ".decoded");
+	writeFile << charMessage;
+	writeFile.close();
+
 }
 void huffTree::writeStringtoBinaryFile()
 {
 	// package message into bytes to write to binary file
 	std::ofstream writeFile(this->inputtedFileName + ".encoded", std::ios::binary);
-	std::cout << "Writing to file " << this->inputtedFileName + ".encoded\n";
+	//std::cout << "Writing to file " << this->inputtedFileName + ".encoded\n";
 	int lenLastByte = (strToEncode.length()+3) % 8; // add three because we will have 3 bits for length of last byte
-	std::cout << "Length of encoding: " << strToEncode.length() << std::endl;
-	std::cout << "Length of last byte: " << lenLastByte << std::endl;
+	//std::cout << "Length of encoding: " << strToEncode.length() << std::endl;
+	//std::cout << "Length of last byte: " << lenLastByte << std::endl;
 	 
 	std::string stringbinRepofLenLastByte = std::bitset<3>(lenLastByte).to_string();
-	std::cout << "Bin rep of len of last byte: " << stringbinRepofLenLastByte << std::endl;
+	//std::cout << "Bin rep of len of last byte: " << stringbinRepofLenLastByte << std::endl;
 
 	std::string lenPlusEncoding = stringbinRepofLenLastByte + strToEncode; // first 3 bits hold length of last byte
-	std::cout << "len + encoding: " << lenPlusEncoding << std::endl;
+	//std::cout << "len + encoding: " << lenPlusEncoding << std::endl;
 	int writecount = 0;
 	char manipChar = 0; // char that we will set the bits of
 	std::string checkbitsagain;
@@ -306,15 +290,15 @@ void huffTree::writeStringtoBinaryFile()
 			}
 		}
 		
-		std::cout << "Byte " << (i / 8) << " " << std::bitset<8>(manipChar).to_string() << std::endl;
+		//std::cout << "Byte " << (i / 8) << " " << std::bitset<8>(manipChar).to_string() << std::endl;
 		checkbitsagain += std::bitset<8>(manipChar).to_string();
 		writecount++;
 
 		writeFile.write(reinterpret_cast<char*>(&manipChar), sizeof(manipChar));
 		manipChar = 0; // reset bits to 0
 	}
-	std::cout << "Write count: " << writecount << std::endl;
-	std::cout << "Check bits again:  " << checkbitsagain << std::endl;
+	//std::cout << "Write count: " << writecount << std::endl;
+	//std::cout << "Check bits again:  " << checkbitsagain << std::endl;
 	writeFile.close();
 }
 int huffTree::eightBitsToAscii(std::vector<char> &eightBitPath)
@@ -351,7 +335,7 @@ int huffTree::eightBitsToAscii(std::vector<char> &eightBitPath)
 }
 void huffTree::setUpAlphabetArray()
 {
-	std::cout << "Alphabet we are working with: " << this->alphabet << std::endl;
+	//std::cout << "Alphabet we are working with: " << this->alphabet << std::endl;
 
 	for (int i = 0; i < this->alphabet.size(); i++)
 	{
