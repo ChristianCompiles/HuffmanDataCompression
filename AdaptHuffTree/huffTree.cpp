@@ -117,7 +117,7 @@ void huffTree::decode(std::string messageToDecode)
 	char tmpCh = 0;
 	std::string charMessage;
 	int i = 0;
-
+	 
 	std::bitset<3> threeBit;
 	int lenLastByte = 0;
 
@@ -135,10 +135,10 @@ void huffTree::decode(std::string messageToDecode)
 	}
 	lenLastByte = (int)threeBit.to_ullong();
 	std::cout << "Last byte len in decode funct: " << lenLastByte << std::endl;
-
-	while (i < messageToDecode.length()-3)
+	std::cout << "At position: " << i << " with total positions: " << messageToDecode.length() << std::endl;
+	while (i < (messageToDecode.length() - (8-lenLastByte)))
 	{
-		//printTree();
+		printTree();
 
 		if (!root) // if tree empty
 		{
@@ -181,21 +181,28 @@ void huffTree::decode(std::string messageToDecode)
 		{
 			while (node->leftChild != nullptr || node->rightChild != nullptr) // take in binary from message until we reach a leaf node
 			{
-				if (messageToDecode[i] == '0') // travel down left path
+				if (i < (messageToDecode.length() - (8 - lenLastByte)))
 				{
-					node = node->leftChild;
+					if (messageToDecode[i] == '0') // travel down left path
+					{
+						node = node->leftChild;
+					}
+					else // travel down right path
+					{
+						node = node->rightChild;
+					}
+					i++;
 				}
-				else // travel down right path
+				else
 				{
-					node = node->rightChild;
+					break;
 				}
-				i++;
 			}
 			if (node->ch == '0') // if the node is the zero Node
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					if (i < messageToDecode.length() - 3) 
+					if (i < (messageToDecode.length() - (8 - lenLastByte)))
 					{
 						eightBitVector.push_back(messageToDecode[i]);
 						i++;
@@ -241,18 +248,40 @@ void huffTree::decode(std::string messageToDecode)
 				increment(node);
 			}
 		}
-		//printTree();
+		printTree();
 
 		charMessage.push_back(tmpCh);
 		std::cout << "Message up to this point: " << charMessage << std::endl;
 	}
+	std::cout << "We are at position " << i << " with total positions: " << messageToDecode.length() << std::endl;
+	
+	//if (lenLastByte > 0) // if we have a portion of a byte to take care of
+	//{
+	//	huffNode* tmpNode = this->root;
+	//	for (int j = 0; j < lenLastByte; j++)
+	//	{
+	//		if (messageToDecode[i] == '0') // travel down left path
+	//		{
+	//			tmpNode = tmpNode->leftChild;
+	//		}
+	//		else // travel down right path
+	//		{
+	//			tmpNode = tmpNode->rightChild;
+	//		}
+	//		i++;
+	//	}
+	//	tmpCh = tmpNode->ch;
+
+	//	charMessage.push_back(tmpCh);
+	//	std::cout << "Message up to this point: " << charMessage << std::endl;
+	//}
 }
 void huffTree::writeStringtoBinaryFile()
 {
 	// package message into bytes to write to binary file
 	std::ofstream writeFile(this->readFileName + ".encoded", std::ios::binary);
 
-	int lenLastByte = strToEncode.length() % 8;
+	int lenLastByte = (strToEncode.length()+3) % 8; // add three because we will have 3 bits for length of last byte
 	std::cout << "Length of encoding: " << strToEncode.length() << std::endl;
 	std::cout << "Length of last byte: " << lenLastByte << std::endl;
 	 
